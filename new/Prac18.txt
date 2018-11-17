@@ -1,0 +1,18 @@
+#Prac18-Roberto Perez
+#Sistema Solar
+import simplegui 
+def pantalla(canvas):
+    canvas.draw_circle((0,460),150,5,"Orange","Orange")
+    canvas.draw_circle((200,460),10,5,"gray","gray")
+    canvas.draw_circle((300,460),15,5,"brown","veish")
+    canvas.draw_circle((400,460),25,5,"Blue","Green")
+    canvas.draw_circle((500,460),27,5,"red","brown")
+    canvas.draw_circle((0,460),625,10,"brown",)
+    canvas.draw_circle((700,460),50,5,"white","brown")
+    canvas.draw_circle((850,460),35,5,"pink","pink")
+    canvas.draw_circle((850,460),50,5,"white")
+    canvas.draw_circle((975,460),33,5,"blue","blue")
+    canvas.draw_circle((1100,460),15,5,"cyan","cyan")
+frame=simplegui.create_frame("Sistema Solar",1250,920)
+frame.set_draw_handler(pantalla)
+frame.start()

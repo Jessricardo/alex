@@ -1,0 +1,123 @@
+<html>
+	<head>
+		<title>Catching Elements!</title>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<style>
+			canvas {
+			    border:1px solid #d3d3d3;
+			    background-color: #f1f1f1;
+			}
+		</style>
+	</head>
+	<body>
+		<h1 onClick="startGame()">Click here to start Game!</h1>
+		<script>
+			var myGamePiece;
+			var enemy;
+			function startGame() {
+			    myGamePiece = new component(30, 30, "red", 40, 135);
+			    enemy = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20));
+			    myGameArea.start();
+			}
+
+			var myGameArea = {
+			    canvas : document.createElement("canvas"),
+			    start : function() {
+			        this.canvas.width = 480;
+			        this.canvas.height = 270;
+			        this.context = this.canvas.getContext("2d");
+			        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+			        this.frameNo = 0;
+			        this.interval = setInterval(updateGameArea, 20);
+			        window.addEventListener('keydown', function (e) {
+			            e.preventDefault();
+			            myGameArea.keys = (myGameArea.keys || []);
+			            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+			        })
+			        window.addEventListener('keyup', function (e) {
+			            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+			        })
+			    },
+			    stop : function() {
+			        clearInterval(this.interval);
+			    },    
+			    clear : function() {
+			        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			    }
+			}
+
+			function component(width, height, color, x, y, type) {
+			    this.type = type;
+			    this.width = width;
+			    this.height = height;
+			    this.speed = 0;
+			    this.angle = 0;
+			    this.moveAngle = 0;
+			    this.x = x;
+			    this.y = y;    
+			    this.update = function() {
+			        ctx = myGameArea.context;
+			        ctx.save();
+			        ctx.translate(this.x, this.y);
+			        ctx.rotate(this.angle);
+			        ctx.fillStyle = color;
+			        ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+			        ctx.restore();    
+			    }
+			    this.newPos = function() {
+			        this.angle += this.moveAngle * Math.PI / 180;
+			        this.x += this.speed * Math.sin(this.angle);
+			        this.y -= this.speed * Math.cos(this.angle);
+			    }
+			}
+
+			function updateGameArea() {
+			    myGameArea.clear();
+			    myGamePiece.moveAngle = 0;
+			    myGamePiece.speed = 0;
+			    if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speed= 5; }
+			    if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speed= -5; }
+			    myGamePiece.newPos();
+			    myGamePiece.update();
+			    enemy.angle = 11;
+			    enemy.speed = 5;
+			    enemy.newPos();
+			    enemy.update();
+			}
+		</script>
+		<section id="rotating-section">
+		    <div id="rotating-animation">
+		        <div>
+		            <div class="rect1"></div>
+		            <div class="rect2"></div>
+		            <div class="rect3"></div>
+		            <div class="rect4"></div>
+		            <div class="rect5"></div>
+		            <div class="rect6"></div>
+		            <div class="rect7"></div>
+		            <div class="rect8"></div>
+		            <div class="rect9"></div>
+		            <div class="rect10"></div>
+		            <div class="rect11"></div>
+		            <div class="rect12"></div>
+		            <div class="rect13"></div>
+	        	    <div class="rect14"></div>
+	        	    <div class="rect15"></div>
+	        	    <div class="rect16"></div>
+		            <div class="rect17"></div>
+		            <div class="rect18"></div>
+		            <div class="rect19"></div>
+        		    <div class="rect20"></div>
+        		</div>
+		    </div>
+		<h1>Catching Elements!</h1>
+		<h3>Instructions: Catch the elements in tiles to catch the given type of compound and avoid the ones that do not match.</h3>
+		<div id = "P1">
+		</div>
+		<div id="URMOM">
+			<h3>Jesús Armando Guerrero      Carlos Alejandro Esparza      Carlos Daniel Esparza      Jesús Antonio López</h3>
+		</div>
+</section>
+	</body>
+</html>

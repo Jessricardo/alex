@@ -1,0 +1,219 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body>
+<h1 id="buttonStart" onClick="startGame()">Start/Restart</h1>
+<span id="Ct"></span>
+<p>Make sure the game area has focus, and use the arrow keys to move the red square around.</p>
+<div>
+  <img id="arrowUp" src="arrowUp.png"></img>
+  <img id="arrowDown" onClick="down()" src="arrowDown.png"></img>
+</div>
+<script>
+var myGamePiece;
+var enemy;
+var enemy2;
+var enemy3;
+var enemy4;
+var enemy5;
+var ally;
+var points = 0;
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 350;
+        this.canvas.height = 270;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 20);
+        window.addEventListener('keydown', function (e) {
+            e.preventDefault();
+            myGameArea.keys = (myGameArea.keys || []);
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+        });
+        window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");
+        });
+    },
+    stop : function() {
+        clearInterval(this.interval);
+    },
+    clear : function() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+function formulas(type) {
+  const nonmetals = [
+    "B",
+    "C",
+    "N",
+    "Cl",
+    "Br",
+    "P",
+    "S",
+    "Se",
+    "F",
+    "I",
+  ];
+  const metals = [
+    "Mg",
+    "Li",
+    "Fe",
+    "U",
+    "Cs",
+    "Ca",
+    "Fr",
+    "Al",
+    "Ga",
+    "At",
+  ];
+  if(type === "NM") {
+    return nonmetals[Math.floor(Math.random() * 10)];
+  } else if (type === "M") {
+    return metals[Math.floor(Math.random() * 10)];
+  }
+}
+function down() {
+  myGamePiece.speed= -5;
+  myGamePiece.newPos();
+  myGamePiece.update();
+}
+function up() {
+  myGamePiece.speed= 5;
+  myGamePiece.newPos();
+  myGamePiece.update();
+}
+function component(width, height, color, x, y, type, formula) {
+
+    this.type = type;
+    this.width = width;
+    this.height = height;
+    this.speed = 0;
+    this.formula = formula;
+    this.angle = 0;
+    this.moveAngle = 0;
+    this.x = x;
+    this.y = y;
+    this.update = function() {
+        ctx = myGameArea.context;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.fillStyle = color;
+        ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+        ctx.fillStyle = "white";
+        ctx.font = "16pt sans-serif";
+        ctx.fillText(this.formula, -12, 10);
+        ctx.restore();
+    }
+    this.restart = function() {
+      this.type = type;
+      this.width = width;
+      this.height = height;
+      this.speed = 0;
+      this.formula = formulas(this.type === "enemy" ? "NM" : "M");
+      this.angle = 0;
+      this.moveAngle = 0;
+      this.x = x;
+      this.y = Math.floor((Math.random() * 245) + 20);
+
+    }
+    this.newPos = function() {
+        this.angle += this.moveAngle * Math.PI / 180;
+        if(this.type === 'enemy') {
+          if (
+            ((this.x >= myGamePiece.x) && (this.x <= myGamePiece.x + myGamePiece.width)) &&
+            ((this.y >= myGamePiece.y) && (this.y <= myGamePiece.y + myGamePiece.height)) ||
+            ((this.x >= myGamePiece.x) && (this.x <= myGamePiece.x + myGamePiece.width)) &&
+            ((this.y + this.height >= myGamePiece.y) && (this.y + this.height <= myGamePiece.y + myGamePiece.height))
+          ) {
+            alert("You lose!");
+  		  location.reload();
+          }
+        }
+		if (
+          ((ally.x >= myGamePiece.x) && (ally.x <= myGamePiece.x + myGamePiece.width)) &&
+          ((ally.y >= myGamePiece.y) && (ally.y <= myGamePiece.y + myGamePiece.height)) ||
+          ((ally.x >= myGamePiece.x) && (ally.x <= myGamePiece.x + myGamePiece.width)) &&
+          ((ally.y + ally.height >= myGamePiece.y) && (ally.y + ally.height <= myGamePiece.y + myGamePiece.height))
+        ) {
+		  points = points + 5;
+      document.getElementById("Ct").innerHTML = "Score: " + points.toString();
+          ally.x = 1000;
+          ally.restart();
+        }
+        if(this.x < 0) {
+          this.restart();
+        }
+		if(ally.x < -400) {
+          ally.restart();
+        }
+		else {
+          this.x += this.speed * Math.sin(this.angle);
+          this.y -= this.speed * Math.cos(this.angle);
+        }
+    }
+}
+function startGame() {
+  if(enemy) {
+    location.reload();
+  }
+    myGamePiece = new component(30, 30, "red", 40, 135, "myGamePiece", "");
+    enemy = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20),"enemy", formulas("NM"));
+    enemy2 = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20),"enemy", formulas("NM"));
+    enemy3 = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20),"enemy", formulas("NM"));
+    enemy4 = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20),"enemy", formulas("NM"));
+    ally = new component(30, 30, "blue", 450, Math.floor((Math.random() * 245) + 20),"ally", formulas("M"));
+    myGameArea.start();
+
+}
+
+function updateGameArea() {
+    myGameArea.clear();
+    myGamePiece.moveAngle = 0;
+    myGamePiece.speed = 0;
+    if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speed= 5; }
+    if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speed= -5; }
+    myGamePiece.newPos();
+    myGamePiece.update();
+    enemy.angle = 11;
+    enemy.speed = 6;
+    enemy.newPos();
+    enemy.update();
+
+    enemy2.angle = 11;
+    enemy2.speed = 8;
+    enemy2.newPos();
+    enemy2.update();
+
+    enemy3.angle = 11;
+    enemy3.speed = 7;
+    enemy3.newPos();
+    enemy3.update();
+
+    enemy4.angle = 11;
+    enemy4.speed = 7;
+    enemy4.newPos();
+    enemy4.update();
+	ally.angle = 11;
+    ally.speed = 7;
+    ally.newPos();
+    ally.update();
+}
+var el = document.getElementById("arrowUp");
+el.addEventListener("touchstart", up, false);
+var el2 = document.getElementById("arrowDown");
+el2.addEventListener("touchstart", down, false);
+
+
+</script>
+</body>
+</html>
